@@ -1,12 +1,13 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = "postgresql://postgres:tarikgg13@localhost:5432/my_trello"
-    SECRET_KEY: str = "super_secret_key"
+    DATABASE_URL: str
+    SECRET_KEY: str
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
-    class Config:
-        env_file = ".env"  # Це дозволить пізніше підвантажувати дані з файлу .env
+    model_config = SettingsConfigDict(
+        env_file='.env'
+)
 
 settings = Settings()
