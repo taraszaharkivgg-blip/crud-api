@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends, Response
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 import config
@@ -232,3 +233,6 @@ def delete_card(db: Session = Depends(get_db), current_card: models.Card = Depen
     db.delete(current_card)
     db.commit()
     return Response(status_code=204)
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
