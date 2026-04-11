@@ -40,9 +40,9 @@ The project uses a one-to-many relationship hierarchy:
 
 3. Create and activate a virtual environment:
     python -m venv venv
-    # Windows:
+    Windows:
     venv\Scripts\activate
-    # Linux/macOS:
+    Linux/macOS:
     source venv/bin/activate
    
 4. Install dependencies:
