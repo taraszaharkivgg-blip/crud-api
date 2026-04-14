@@ -162,7 +162,8 @@ def delete_board(db: Session = Depends(get_db), board: models.Board = Depends(ge
 def create_list(lists: schemas.ListCreate, db: Session = Depends(get_db), board: models.Board = Depends(get_current_board)):
     new_list = models.BoardList(
         title = lists.title,
-        board_id = board.id
+        board_id = board.id,
+        position = lists.position
     )
 
     db.add(new_list)
@@ -173,7 +174,10 @@ def create_list(lists: schemas.ListCreate, db: Session = Depends(get_db), board:
 
 @app.patch('/boards/{board_id}/lists/{list_id}', response_model=schemas.ListOut, tags=['List'])
 def update_list(list_update: schemas.ListCreate, db: Session = Depends(get_db), current_list: models.BoardList = Depends(get_current_list)):
-    current_list.title = list_update.title
+    update = list_update.model_dump(exclude_unset=True)
+
+    for key, value in update.items():
+        setattr(current_list, key, value)
 
     db.commit()
     db.refresh(current_list)
@@ -181,7 +185,9 @@ def update_list(list_update: schemas.ListCreate, db: Session = Depends(get_db), 
 
 @app.get('/boards/{board_id}/lists/{list_id}', response_model=List[schemas.ListOut], tags=['List'])
 def get_lists(db: Session = Depends(get_db), current_board: models.Board = Depends(get_current_board)):
-    query = select(models.BoardList).where(models.BoardList.board_id == current_board.id)
+    query = select(models.BoardList).where(
+        models.BoardList.board_id == current_board.id
+    ).order_by(models.BoardList.position)
     result = db.execute(query)
     boards = result.scalars().all()
 
@@ -200,7 +206,8 @@ def create_card(card: schemas.CardCreate, db: Session = Depends(get_db), current
     new_card = models.Card(
         title = card.title,
         description = card.description,
-        list_id = current_list.id
+        list_id = current_list.id,
+        position = card.position
     )
 
     db.add(new_card)
@@ -222,7 +229,9 @@ def update_card(card_update: schemas.CardUpdate, db: Session = Depends(get_db), 
 
 @app.get('/boards/{board_id}/lists/{list_id}/cards', response_model=List[schemas.CardOut], tags=['Card'])
 def get_cards(db: Session = Depends(get_db), current_list: models.BoardList = Depends(get_current_list)):
-    query = select(models.Card).where(models.Card.list_id == current_list.id)
+    query = select(models.Card).where(
+        models.Card.list_id == current_list.id
+    ).order_by(models.Card.position)
     result = db.execute(query)
     cards = result.scalars().all()
 
