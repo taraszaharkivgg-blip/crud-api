@@ -183,15 +183,15 @@ def update_list(list_update: schemas.ListCreate, db: Session = Depends(get_db), 
     db.refresh(current_list)
     return current_list
 
-@app.get('/boards/{board_id}/lists/{list_id}', response_model=List[schemas.ListOut], tags=['List'])
+@app.get('/boards/{board_id}/lists', response_model=List[schemas.ListOut], tags=['List'])
 def get_lists(db: Session = Depends(get_db), current_board: models.Board = Depends(get_current_board)):
     query = select(models.BoardList).where(
         models.BoardList.board_id == current_board.id
     ).order_by(models.BoardList.position)
     result = db.execute(query)
-    boards = result.scalars().all()
+    lists = result.scalars().all()
 
-    return boards
+    return lists
 
 @app.delete('/boards/{board_id}/lists/{list_id}', status_code=204, tags=['List'])
 def delete_list(db: Session = Depends(get_db), current_list: models.BoardList = Depends(get_current_list)):
